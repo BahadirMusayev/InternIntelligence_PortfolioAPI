@@ -78,12 +78,12 @@ class UserServiceTest {
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
             mockedStatic.when(UserAuthService::getUser).thenReturn(mockUser);
+
+            userService.updateName(newName);
+
+            assertEquals(newName, mockUser.getName(), "Should change name !");
+            verify(userRepository).save(mockUser);
         }
-
-        userService.updateName(newName);
-
-        assertEquals(newName, mockUser.getName(), "Should change name !");
-        verify(userRepository).save(mockUser);
     }
 
     @Test
@@ -96,11 +96,11 @@ class UserServiceTest {
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
             mockedStatic.when(UserAuthService::getUser).thenReturn(mockUser);
+
+            userService.updateSurname(newSurname);
+
+            assertEquals(newSurname, mockUser.getSurname(), "Should change surname !");
+            verify(userRepository).save(mockUser);
         }
-
-        userService.updateSurname(newSurname);
-
-        assertEquals(newSurname, mockUser.getSurname(), "Should change surname !");
-        verify(userRepository).save(mockUser);
     }
 }
