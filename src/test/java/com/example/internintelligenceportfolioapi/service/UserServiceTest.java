@@ -56,7 +56,7 @@ class UserServiceTest {
             assertEquals(expectedDto.getSurname(), result.getSurname(), "Surname not mapped correctly !");
             assertEquals(expectedDto.getBirthDate(), result.getBirthDate(), "Birth Date is not mapped correctly !");
             assertEquals(expectedDto.getEmail(), result.getEmail(), "Email is not mapped correctly !");
-            assertEquals(Set.of("Java", "Spring"), result.getSkills(), "Skills are not mapped correctly !");
+            assertEquals(expectedDto.getSkills(), result.getSkills(), "Skills are not mapped correctly !");
 
             mockedStatic.verify(UserAuthService::getUser);
             verify(userMapper).mapEntityToDtoOutput(mockUserEntity);
