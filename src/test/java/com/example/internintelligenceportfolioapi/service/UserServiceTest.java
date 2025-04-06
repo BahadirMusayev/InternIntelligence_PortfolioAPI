@@ -1,6 +1,7 @@
 package com.example.internintelligenceportfolioapi.service;
 
 import com.example.internintelligenceportfolioapi.dao.entity.UserEntity;
+import com.example.internintelligenceportfolioapi.dao.repository.UserRepository;
 import com.example.internintelligenceportfolioapi.mapper.UserMapper;
 import com.example.internintelligenceportfolioapi.model.output.UserDtoOutput;
 import com.example.internintelligenceportfolioapi.service.auth.UserAuthService;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -20,6 +22,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
+    @Mock
+    private UserRepository userRepository;
 
     @Mock
     private UserMapper userMapper;
@@ -61,6 +65,23 @@ class UserServiceTest {
             mockedStatic.verify(UserAuthService::getUser);
             verify(userMapper).mapEntityToDtoOutput(mockUserEntity);
             verifyNoMoreInteractions(userMapper);
+        }
+    }
+
+    @Test
+    @Transactional
+    void updateName() {
+        String newName = "John";
+        UserEntity mockUser = new UserEntity();
+        mockUser.setName("Bahadur");
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(mockUser);
+
+            userService.updateName(newName);
+
+            assertEquals(newName, mockUser.getName(), "Should change name !");
+            verify(userRepository).save(mockUser);
         }
     }
 }
