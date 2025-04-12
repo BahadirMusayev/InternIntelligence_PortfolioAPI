@@ -168,23 +168,24 @@ class UserServiceTest {
     @Transactional
     void updatePassword() {
         UserEntity userEntity = new UserEntity();
-        userEntity.setPassword("$2b$12$NkrXxAACDdRMK9Rwwttdee0M8SzNE7vVj/Z0R0X9WPcABwmTFgjsW");
+        String originalEncodedPassword = "$2a$10$.XxkQhLZ5Hj3yxdyo9veZein5GfjAe4lIOYcMsR7oXZx/wHBFYcMa";
+        userEntity.setPassword(originalEncodedPassword);
 
         String currentPassword = "string";
         String newPassword = "new_secret";
-        String encodedNewPassword = "$2b$12$BikZ.JhuDKdHXZ0KrC9T5OmwQVOD7l.TbplisIc/5AJ6NriN/Oyg6";
+        String newEncodedPassword = "$2a$10$pSxG4n64jT6ydFy1JKOJTO5SQS96mo27AR9I.k3FB0Dc71CZjGHc2";
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
             mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
-            when(passwordEncoder.matches(currentPassword, "$2b$12$NkrXxAACDdRMK9Rwwttdee0M8SzNE7vVj/Z0R0X9WPcABwmTFgjsW")).thenReturn(true);
-            when(passwordEncoder.encode(newPassword)).thenReturn(encodedNewPassword);
+            when(passwordEncoder.matches(currentPassword, originalEncodedPassword)).thenReturn(true);
+            when(passwordEncoder.encode(newPassword)).thenReturn(newEncodedPassword);
 
             userService.updatePassword(currentPassword, newPassword);
 
-            assertEquals(encodedNewPassword, userEntity.getPassword(), "Password must be encoded and updated!");
+            assertEquals(newEncodedPassword, userEntity.getPassword(), "Password must be encoded and updated!");
             mockedStatic.verify(UserAuthService::getUser);
-            verify(passwordEncoder).matches(currentPassword, "$2b$12$NkrXxAACDdRMK9Rwwttdee0M8SzNE7vVj/Z0R0X9WPcABwmTFgjsW");
             verify(passwordEncoder).encode(newPassword);
+            verify(passwordEncoder).matches(currentPassword, originalEncodedPassword);
             verify(userRepository).save(userEntity);
         }
     }
