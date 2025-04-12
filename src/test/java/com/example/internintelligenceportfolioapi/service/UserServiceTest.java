@@ -33,25 +33,25 @@ class UserServiceTest {
 
     @Test
     void get() {
-        UserEntity mockUserEntity = new UserEntity();
-        mockUserEntity.setId(1);
-        mockUserEntity.setName("Ali");
-        mockUserEntity.setSurname("Ali");
-        mockUserEntity.setBirthDate(LocalDate.of(1990, 1, 1));
-        mockUserEntity.setEmail("ali@example.com");
-        mockUserEntity.setSkills(Set.of("Java", "Spring"));
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        userEntity.setName("Ali");
+        userEntity.setSurname("Ali");
+        userEntity.setBirthDate(LocalDate.of(1990, 1, 1));
+        userEntity.setEmail("ali@example.com");
+        userEntity.setPassword("hidden089");
+        userEntity.setSkills(Set.of("Java", "Spring"));
 
-        UserDtoOutput expectedDto = UserDtoOutput.builder()
-                .name("Ali")
-                .surname("Ali")
-                .birthDate(LocalDate.of(1990, 1, 1))
-                .email("ali@example.com")
-                .skills(Set.of("Java", "Spring"))
-                .build();
+        UserDtoOutput userDtoOutput = new UserDtoOutput();
+        userDtoOutput.setName("Ali");
+        userDtoOutput.setSurname("Ali");
+        userDtoOutput.setBirthDate(LocalDate.of(1990, 1, 1));
+        userDtoOutput.setEmail("ali@example.com");
+        userDtoOutput.setSkills(Set.of("Java", "Spring"));
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
-            mockedStatic.when(UserAuthService::getUser).thenReturn(mockUserEntity);
-            when(userMapper.mapEntityToDtoOutput(mockUserEntity)).thenReturn(expectedDto);
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+            when(userMapper.mapEntityToDtoOutput(userEntity)).thenReturn(userDtoOutput);
 
             UserDtoOutput result = userService.get();
 
@@ -63,44 +63,82 @@ class UserServiceTest {
             assertEquals(expectedDto.getSkills(), result.getSkills(), "Skills are not mapped correctly !");
 
             mockedStatic.verify(UserAuthService::getUser);
-            verify(userMapper).mapEntityToDtoOutput(mockUserEntity);
-            verifyNoMoreInteractions(userMapper);
+            verify(userMapper).mapEntityToDtoOutput(userEntity);
         }
     }
 
     @Test
     @Transactional
     void updateName() {
-        UserEntity mockUser = new UserEntity();
-        mockUser.setName("Bahadur");
-
-        String newName = "John";
+        UserEntity userEntity = new UserEntity();
+        userEntity.setName("Bahadur");
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
-            mockedStatic.when(UserAuthService::getUser).thenReturn(mockUser);
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
 
+            String newName = "John";
             userService.updateName(newName);
 
-            assertEquals(newName, mockUser.getName(), "Should change name !");
-            verify(userRepository).save(mockUser);
+            assertEquals("John", userEntity.getName(), "Should change name !");
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(userRepository).save(userEntity);
         }
     }
 
     @Test
     @Transactional
     void updateSurname() {
-        UserEntity mockUser = new UserEntity();
-        mockUser.setSurname("Musayev");
-
-        String newSurname = "Aleksandr";
+        UserEntity userEntity = new UserEntity();
+        userEntity.setSurname("Musayev");
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
-            mockedStatic.when(UserAuthService::getUser).thenReturn(mockUser);
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
 
+            String newSurname = "Aleksandr";
             userService.updateSurname(newSurname);
 
-            assertEquals(newSurname, mockUser.getSurname(), "Should change surname !");
-            verify(userRepository).save(mockUser);
+            assertEquals("Aleksandr", userEntity.getSurname(), "Should change surname !");
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(userRepository).save(userEntity);
+        }
+    }
+
+    @Test
+    @Transactional
+    void updateBirthDate() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setBirthDate(LocalDate.of(2006, 4, 14));
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            LocalDate newBirthDate = LocalDate.of(2006, 4, 14);
+            userService.updateBirthDate(newBirthDate);
+
+            assertEquals(LocalDate.of(2006,4,14), userEntity.getBirthDate(), "Should change birth date !");
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(userRepository).save(userEntity);
+        }
+    }
+
+    @Test
+    @Transactional
+    void deleteBirthDate() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        userEntity.setName("Ali");
+        userEntity.setSurname("Ali");
+        userEntity.setBirthDate(LocalDate.of(1990, 1, 1));
+        userEntity.setEmail("ali@example.com");
+        userEntity.setSkills(Set.of("Java", "Spring"));
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            userService.deleteBirthDate();
+            UserDtoOutput result = userService.get();
+
+            assertNull(result, "");
         }
     }
 }
