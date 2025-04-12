@@ -79,6 +79,7 @@ class UserServiceTest {
             String newName = "John";
             userService.updateName(newName);
 
+            assertNotNull(userEntity.getName(), "Name is not null !");
             assertEquals("John", userEntity.getName(), "Should change name !");
             mockedStatic.verify(UserAuthService::getUser);
             verify(userRepository).save(userEntity);
@@ -97,6 +98,7 @@ class UserServiceTest {
             String newSurname = "Aleksandr";
             userService.updateSurname(newSurname);
 
+            assertNotNull(userEntity.getSurname(), "Surname is not null !");
             assertEquals("Aleksandr", userEntity.getSurname(), "Should change surname !");
             mockedStatic.verify(UserAuthService::getUser);
             verify(userRepository).save(userEntity);
@@ -115,6 +117,7 @@ class UserServiceTest {
             LocalDate newBirthDate = LocalDate.of(2006, 4, 14);
             userService.updateBirthDate(newBirthDate);
 
+            assertNotNull(userEntity.getBirthDate(), "Birth Date is not null !");
             assertEquals(LocalDate.of(2006,4,14), userEntity.getBirthDate(), "Should change birth date !");
             mockedStatic.verify(UserAuthService::getUser);
             verify(userRepository).save(userEntity);
@@ -125,20 +128,35 @@ class UserServiceTest {
     @Transactional
     void deleteBirthDate() {
         UserEntity userEntity = new UserEntity();
-        userEntity.setId(1);
-        userEntity.setName("Ali");
-        userEntity.setSurname("Ali");
         userEntity.setBirthDate(LocalDate.of(1990, 1, 1));
-        userEntity.setEmail("ali@example.com");
-        userEntity.setSkills(Set.of("Java", "Spring"));
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
             mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
 
             userService.deleteBirthDate();
-            UserDtoOutput result = userService.get();
+            assertNull(userEntity.getBirthDate(), "Birth Date should be null !");
 
-            assertNull(result, "");
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(userRepository).save(userEntity);
+        }
+    }
+
+    @Test
+    @Transactional
+    void updateEmail() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail("bahadurmusayev15@gmail.com");
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            String newEmail = "john@gmail.com";
+            userService.updateEmail(newEmail);
+
+            assertNotNull(userEntity.getEmail(), "Email is not null !");
+            assertEquals("john@gmail.com", userEntity.getEmail(), "Should change email !");
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(userRepository).save(userEntity);
         }
     }
 }
