@@ -212,4 +212,25 @@ class UserServiceTest {
             verify(userRepository).save(userEntity);
         }
     }
+
+    @Test
+    @Transactional
+    void deleteSkill() {
+        UserEntity userEntity = new UserEntity();
+        Set<String> skills = new HashSet<>();
+        skills.add("Java");
+        skills.add("Spring");
+        userEntity.setSkills(skills);
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            String skill = "Java";
+            userService.deleteSkill(skill);
+
+            assertEquals(Set.of("Spring"), userEntity.getSkills(), "Skill isn't delete !");
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(userRepository).save(userEntity);
+        }
+    }
 }
