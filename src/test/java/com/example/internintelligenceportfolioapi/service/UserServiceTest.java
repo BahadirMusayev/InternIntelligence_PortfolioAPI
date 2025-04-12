@@ -122,7 +122,7 @@ class UserServiceTest {
             userService.updateBirthDate(newBirthDate);
 
             assertNotNull(userEntity.getBirthDate(), "Birth Date is not null !");
-            assertEquals(LocalDate.of(2006,4,14), userEntity.getBirthDate(), "Should change birth date !");
+            assertEquals(LocalDate.of(2006, 4, 14), userEntity.getBirthDate(), "Should change birth date !");
             mockedStatic.verify(UserAuthService::getUser);
             verify(userRepository).save(userEntity);
         }
@@ -168,23 +168,22 @@ class UserServiceTest {
     @Transactional
     void updatePassword() {
         UserEntity userEntity = new UserEntity();
-        userEntity.setPassword("$2a$10$.XxkQhLZ5Hj3yxdyo9veZein5GfjAe4lIOYcMsR7oXZx/wHBFYcMa");
+        userEntity.setPassword("$2b$12$NkrXxAACDdRMK9Rwwttdee0M8SzNE7vVj/Z0R0X9WPcABwmTFgjsW");
 
         String currentPassword = "string";
         String newPassword = "new_secret";
-        String encodedNewPassword = "$2a$10$pSxG4n64jT6ydFy1JKOJTO5SQS96mo27AR9I.k3FB0Dc71CZjGHc2";
+        String encodedNewPassword = "$2b$12$BikZ.JhuDKdHXZ0KrC9T5OmwQVOD7l.TbplisIc/5AJ6NriN/Oyg6";
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
             mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
-
-            when(passwordEncoder.matches(currentPassword, userEntity.getPassword())).thenReturn(true);
+            when(passwordEncoder.matches(currentPassword, "$2b$12$NkrXxAACDdRMK9Rwwttdee0M8SzNE7vVj/Z0R0X9WPcABwmTFgjsW")).thenReturn(true);
             when(passwordEncoder.encode(newPassword)).thenReturn(encodedNewPassword);
 
             userService.updatePassword(currentPassword, newPassword);
 
             assertEquals(encodedNewPassword, userEntity.getPassword(), "Password must be encoded and updated!");
             mockedStatic.verify(UserAuthService::getUser);
-            verify(passwordEncoder).matches(currentPassword, userEntity.getPassword());
+            verify(passwordEncoder).matches(currentPassword, "$2b$12$NkrXxAACDdRMK9Rwwttdee0M8SzNE7vVj/Z0R0X9WPcABwmTFgjsW");
             verify(passwordEncoder).encode(newPassword);
             verify(userRepository).save(userEntity);
         }
