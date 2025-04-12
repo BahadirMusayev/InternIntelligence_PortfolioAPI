@@ -233,4 +233,26 @@ class UserServiceTest {
             verify(userRepository).save(userEntity);
         }
     }
+
+    @Test
+    @Transactional
+    void delete() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        userEntity.setName("Ali");
+        userEntity.setSurname("Ali");
+        userEntity.setBirthDate(LocalDate.of(1990, 1, 1));
+        userEntity.setEmail("ali@example.com");
+        userEntity.setPassword("hidden089");
+        userEntity.setSkills(Set.of("Java", "Spring"));
+
+        try(MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)){
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            userService.delete();
+
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(userRepository).deleteById(userEntity.getId());
+        }
+    }
 }
