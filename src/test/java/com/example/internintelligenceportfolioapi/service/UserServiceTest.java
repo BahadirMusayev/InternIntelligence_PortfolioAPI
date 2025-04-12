@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -186,6 +187,28 @@ class UserServiceTest {
             mockedStatic.verify(UserAuthService::getUser);
             verify(passwordEncoder).encode(newPassword);
             verify(passwordEncoder).matches(currentPassword, originalEncodedPassword);
+            verify(userRepository).save(userEntity);
+        }
+    }
+
+    @Test
+    @Transactional
+    void addSkill() {
+        UserEntity userEntity = new UserEntity();
+        Set<String> skills = new HashSet<>();
+        skills.add("Java");
+        skills.add("Spring");
+        userEntity.setSkills(skills);
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            String newSkill = "Microservices";
+            userService.addSkill(newSkill);
+
+            assertNotNull(userEntity.getSkills(), "Skills is not null !");
+            assertEquals(Set.of("Java", "Spring", "Microservices"), userEntity.getSkills(), "Skill isn't add !");
+            mockedStatic.verify(UserAuthService::getUser);
             verify(userRepository).save(userEntity);
         }
     }
