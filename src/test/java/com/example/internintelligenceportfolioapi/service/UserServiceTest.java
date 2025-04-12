@@ -166,13 +166,13 @@ class UserServiceTest {
 
     @Test
     @Transactional
-    void updatePassword_successful() {
+    void updatePassword() {
         UserEntity userEntity = new UserEntity();
-        userEntity.setPassword("$2a$10$iGmMUQUTSKIMDJk0roEq3uh0rga/d7/OwHR92c8mHAKfYTlMJN9YO");
+        userEntity.setPassword("$2a$10$.XxkQhLZ5Hj3yxdyo9veZein5GfjAe4lIOYcMsR7oXZx/wHBFYcMa");
 
         String currentPassword = "string";
         String newPassword = "new_secret";
-        String encodedNewPassword = "encoded_new";
+        String encodedNewPassword = "$2a$10$pSxG4n64jT6ydFy1JKOJTO5SQS96mo27AR9I.k3FB0Dc71CZjGHc2";
 
         try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
             mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
@@ -189,5 +189,4 @@ class UserServiceTest {
             verify(userRepository).save(userEntity);
         }
     }
-
 }
