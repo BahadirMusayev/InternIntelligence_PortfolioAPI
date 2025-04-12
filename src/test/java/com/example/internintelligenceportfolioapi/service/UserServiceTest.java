@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -27,6 +28,9 @@ class UserServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -159,4 +163,31 @@ class UserServiceTest {
             verify(userRepository).save(userEntity);
         }
     }
+
+    @Test
+    @Transactional
+    void updatePassword_successful() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setPassword("$2a$10$iGmMUQUTSKIMDJk0roEq3uh0rga/d7/OwHR92c8mHAKfYTlMJN9YO");
+
+        String currentPassword = "string";
+        String newPassword = "new_secret";
+        String encodedNewPassword = "encoded_new";
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            when(passwordEncoder.matches(currentPassword, userEntity.getPassword())).thenReturn(true);
+            when(passwordEncoder.encode(newPassword)).thenReturn(encodedNewPassword);
+
+            userService.updatePassword(currentPassword, newPassword);
+
+            assertEquals(encodedNewPassword, userEntity.getPassword(), "Password must be encoded and updated!");
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(passwordEncoder).matches(currentPassword, userEntity.getPassword());
+            verify(passwordEncoder).encode(newPassword);
+            verify(userRepository).save(userEntity);
+        }
+    }
+
 }
