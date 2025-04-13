@@ -75,7 +75,7 @@ class UserAuthServiceTest {
         expectedEntity.setEmail("ali@example.com");
         expectedEntity.setPassword(encodedPassword);
 
-        when(userRepository.findByEmail(inputDto.getEmail())).thenReturn(userEntity);
+        when(userRepository.findByEmail(inputDto.getEmail())).thenReturn(null);
         when(passwordEncoder.encode(rawPassword)).thenReturn(encodedPassword);
         when(userMapper.mapRegistrationDtoInputToEntity(registrationDtoInput)).thenReturn(expectedEntity);
 
