@@ -3,13 +3,19 @@ package com.example.internintelligenceportfolioapi.service.auth;
 import com.example.internintelligenceportfolioapi.dao.entity.UserEntity;
 import com.example.internintelligenceportfolioapi.dao.repository.UserRepository;
 import com.example.internintelligenceportfolioapi.mapper.UserMapper;
+import com.example.internintelligenceportfolioapi.model.auth.AuthenticationDto;
+import com.example.internintelligenceportfolioapi.model.input.UserLoginDtoInput;
 import com.example.internintelligenceportfolioapi.model.input.UserRegistrationDtoInput;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
@@ -27,10 +33,17 @@ class UserAuthServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private AuthenticationManager authManager;
+
     @InjectMocks
     private UserAuthService userAuthService;
 
     @Test
+    @Transactional
     void signUp() {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1);
@@ -79,5 +92,35 @@ class UserAuthServiceTest {
         verify(userMapper).mapRegistrationDtoInputToEntity(registrationDtoInput);
         verify(userRepository).save(expectedEntity);
         verifyNoMoreInteractions(userRepository, passwordEncoder, userMapper);
+    }
+
+    @Test
+    void login() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        userEntity.setEmail("ali@example.com");
+        userEntity.setPassword("$2a$10$gEn9n7biN.TuvOvvXAy11OkVaAobZVYtDUZJZb4CKruLsMzfR3U8y");
+
+        UserLoginDtoInput userLoginDtoInput = new UserLoginDtoInput();
+        userLoginDtoInput.setEmail("ali@example.com");
+        userLoginDtoInput.setPassword("string");
+
+        Authentication authentication = mock(Authentication.class);
+        String jwtToken = "jwt-token";
+
+        when(userRepository.findByEmail(userLoginDtoInput.getEmail())).thenReturn(userEntity);
+        when(passwordEncoder.matches(userLoginDtoInput.getPassword(), userEntity.getPassword())).thenReturn(true);
+        when(authManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+        when(jwtService.generateToken(userEntity)).thenReturn(jwtToken);
+
+        AuthenticationDto result = userAuthService.login(userLoginDtoInput);
+
+        assertEquals("jwt-token", result.getToken(), "JWT Token is invalid !");
+
+        verify(userRepository).findByEmail(userLoginDtoInput.getEmail());
+        verify(passwordEncoder).matches(userLoginDtoInput.getPassword(), userEntity.getPassword());
+        verify(authManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(jwtService).generateToken(userEntity);
+        verifyNoMoreInteractions(userRepository, passwordEncoder, authManager, jwtService);
     }
 }
