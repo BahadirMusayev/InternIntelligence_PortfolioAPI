@@ -116,4 +116,31 @@ class EducationServiceTest {
             verify(educationRepository).save(educationEntity);
         }
     }
+
+    @Test
+    @Transactional
+    void updateName() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+
+        EducationEntity educationEntity = new EducationEntity();
+        educationEntity.setId(1);
+        educationEntity.setName("Compar");
+
+        List<EducationEntity> educationEntities = List.of(educationEntity);
+        userEntity.setEducationEntities(educationEntities);
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            String newName = "ITStep";
+            educationService.updateName(0, newName);
+
+            assertNotNull(educationEntity.getName(), "Name is null !");
+            assertEquals(newName, educationEntity.getName(), "Should change name !");
+
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(educationRepository).save(educationEntity);
+        }
+    }
 }
