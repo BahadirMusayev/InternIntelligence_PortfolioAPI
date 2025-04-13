@@ -129,7 +129,7 @@ class UserAuthServiceTest {
     }
 
     @Test
-    void getUser_ShouldReturnUserEntity_WhenAuthenticated() {
+    void getUser() {
         UserEntity mockUser = new UserEntity();
         mockUser.setId(1);
         mockUser.setEmail("test@example.com");
