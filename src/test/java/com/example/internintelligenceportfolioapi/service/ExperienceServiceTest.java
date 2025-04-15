@@ -1,6 +1,5 @@
 package com.example.internintelligenceportfolioapi.service;
 
-import com.example.internintelligenceportfolioapi.dao.entity.EducationEntity;
 import com.example.internintelligenceportfolioapi.dao.entity.ExperienceEntity;
 import com.example.internintelligenceportfolioapi.dao.entity.UserEntity;
 import com.example.internintelligenceportfolioapi.dao.repository.ExperienceRepository;
