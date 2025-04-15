@@ -143,4 +143,131 @@ class EducationServiceTest {
             verify(educationRepository).save(educationEntity);
         }
     }
+
+    @Test
+    @Transactional
+    void updateSpeciality() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+
+        EducationEntity educationEntity = new EducationEntity();
+        educationEntity.setId(1);
+        educationEntity.setSpeciality("Java");
+
+        List<EducationEntity> educationEntities = List.of(educationEntity);
+        userEntity.setEducationEntities(educationEntities);
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            String newSpeciality = "C++";
+            educationService.updateSpeciality(0, newSpeciality);
+
+            assertNotNull(educationEntity.getSpeciality(), "Specialty is null !");
+            assertEquals(newSpeciality, educationEntity.getSpeciality(), "Should change speciality !");
+
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(educationRepository).save(educationEntity);
+        }
+    }
+
+    @Test
+    @Transactional
+    void updateDegree() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+
+        EducationEntity educationEntity = new EducationEntity();
+        educationEntity.setId(1);
+        educationEntity.setDegree("Bachelor");
+
+        List<EducationEntity> educationEntities = List.of(educationEntity);
+        userEntity.setEducationEntities(educationEntities);
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            String newDegree = "Master";
+            educationService.updateDegree(0, newDegree);
+
+            assertNotNull(educationEntity.getDegree(), "Degree is null !");
+            assertEquals(newDegree, educationEntity.getDegree(), "Should change degree !");
+
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(educationRepository).save(educationEntity);
+        }
+    }
+
+    @Test
+    @Transactional
+    void updateStartDate() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+
+        EducationEntity educationEntity = new EducationEntity();
+        educationEntity.setId(1);
+        educationEntity.setStartDate(LocalDate.of(1990,1,1));
+
+        List<EducationEntity> educationEntities = List.of(educationEntity);
+        userEntity.setEducationEntities(educationEntities);
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            LocalDate newStartDate = LocalDate.of(1990,1,8);
+            educationService.updateStartDate(0, newStartDate);
+
+            assertNotNull(educationEntity.getStartDate(), "Start Date is null !");
+            assertEquals(newStartDate, educationEntity.getStartDate(), "Should change start date !");
+
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(educationRepository).save(educationEntity);
+        }
+    }
+
+    @Test
+    @Transactional
+    void updateEndDate() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+
+        EducationEntity educationEntity = new EducationEntity();
+        educationEntity.setId(1);
+        educationEntity.setEndDate(LocalDate.of(1990,1,1));
+
+        List<EducationEntity> educationEntities = List.of(educationEntity);
+        userEntity.setEducationEntities(educationEntities);
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            LocalDate newEndDate = LocalDate.of(1990,1,12);
+            educationService.updateEndDate(0, newEndDate);
+
+            assertNotNull(educationEntity.getEndDate(), "End Date is null !");
+            assertEquals(newEndDate, educationEntity.getEndDate(), "Should change end date !");
+
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(educationRepository).save(educationEntity);
+        }
+    }
+
+    @Test
+    @Transactional
+    void delete(){
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+
+        EducationEntity educationEntity = new EducationEntity();
+        educationEntity.setId(1);
+        educationEntity.setName("Compar");
+        educationEntity.setSpeciality("Java Backend Development");
+        educationEntity.setDegree("Advanced");
+        educationEntity.setStartDate(LocalDate.of(2024, 7, 1));
+        educationEntity.setEndDate(LocalDate.of(2024, 12, 1));
+        List<EducationEntity> educationEntities = List.of(educationEntity);
+        userEntity.setEducationEntities(educationEntities);
+
+
+    }
 }
