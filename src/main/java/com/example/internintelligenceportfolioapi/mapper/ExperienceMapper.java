@@ -1,10 +1,7 @@
 package com.example.internintelligenceportfolioapi.mapper;
 
-import com.example.internintelligenceportfolioapi.dao.entity.EducationEntity;
 import com.example.internintelligenceportfolioapi.dao.entity.ExperienceEntity;
-import com.example.internintelligenceportfolioapi.model.input.EducationDtoInput;
 import com.example.internintelligenceportfolioapi.model.input.ExperienceDtoInput;
-import com.example.internintelligenceportfolioapi.model.output.EducationDtoOutput;
 import com.example.internintelligenceportfolioapi.model.output.ExperienceDtoOutput;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
