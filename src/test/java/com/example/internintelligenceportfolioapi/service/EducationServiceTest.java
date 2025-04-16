@@ -252,5 +252,30 @@ class EducationServiceTest {
         }
     }
 
+    @Test
+    @Transactional
+    void delete(){
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
 
+        EducationEntity educationEntity = new EducationEntity();
+        educationEntity.setId(1);
+        educationEntity.setName("Compar");
+        educationEntity.setSpeciality("Java Backend Development");
+        educationEntity.setDegree("Advanced");
+        educationEntity.setStartDate(LocalDate.of(2024, 7, 1));
+        educationEntity.setEndDate(LocalDate.of(2024, 12, 1));
+
+        List<EducationEntity> educationEntities = List.of(educationEntity);
+        userEntity.setEducationEntities(educationEntities);
+
+        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
+            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
+
+            educationService.delete(0);
+
+            mockedStatic.verify(UserAuthService::getUser);
+            verify(educationRepository).deleteById(1);
+        }
+    }
 }
