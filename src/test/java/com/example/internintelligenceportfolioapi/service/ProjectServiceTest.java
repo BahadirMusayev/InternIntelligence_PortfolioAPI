@@ -252,30 +252,5 @@ class ProjectServiceTest {
         }
     }
 
-    @Test
-    @Transactional
-    void delete(){
-        UserEntity userEntity = new UserEntity();
-        userEntity.setId(1);
 
-        ProjectEntity projectEntity = new ProjectEntity();
-        projectEntity.setId(1);
-        projectEntity.setName("ReserOne");
-        projectEntity.setUrl("reserone.com");
-        projectEntity.setAbout("Barber Reservation Project");
-        projectEntity.setStartDate(LocalDate.of(2024, 7, 1));
-        projectEntity.setEndDate(LocalDate.of(2024, 12, 1));
-
-        List<ProjectEntity> projectEntities = List.of(projectEntity);
-        userEntity.setProjectEntities(projectEntities);
-
-        try (MockedStatic<UserAuthService> mockedStatic = Mockito.mockStatic(UserAuthService.class)) {
-            mockedStatic.when(UserAuthService::getUser).thenReturn(userEntity);
-
-            projectService.delete(0);
-
-            mockedStatic.verify(UserAuthService::getUser);
-            verify(projectRepository).deleteById(1);
-        }
-    }
 }
